@@ -124,3 +124,30 @@ async def parse_job_details(session: ClientSession, job_link: str) -> List[str]:
     else:
         logging.warning(f"No description found for {job_link}")
         return []
+
+
+async def main():
+    """
+    Main function to orchestrate the loading, fetching, and processing of job listings.
+    """
+    start_url = "https://jobs.dou.ua/vacancies/?category=Python"
+    page_source = load_all_vacancies(start_url)
+    soup = BeautifulSoup(page_source, "html.parser")
+
+    job_links = [a["href"] for a in soup.select("a.vt")]
+    logging.info(f"Found {len(job_links)} job links")
+
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+    async with ClientSession(connector=TCPConnector(ssl=ssl_context)) as session:
+        async with aio_open("vacancies_technologies.csv", "w", newline="", encoding="utf-8") as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=["technologies"])
+            await writer.writeheader()
+
+            tasks = [parse_job_details(session, job_link) for job_link in job_links]
+            results = await asyncio.gather(*tasks)
+
+            for technologies in results:
+                if technologies:
+                    await writer.writerow({"technologies": technologies})
+
+        logging.info(f"Technologies for all vacancies written to vacancies_technologies.csv")
