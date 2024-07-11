@@ -101,3 +101,26 @@ def extract_technologies(text: str) -> List[str]:
         if keyword.lower() in text.lower():
             keywords_found.append(keyword)
     return keywords_found
+
+
+async def parse_job_details(session: ClientSession, job_link: str) -> List[str]:
+    """
+    Fetches and parses job details from a job listing page asynchronously.
+
+    Args:
+        session (ClientSession): The aiohttp client session.
+        job_link (str): The URL of the job listing page.
+
+    Returns:
+        list: A list of technologies mentioned in the job listing.
+    """
+    page_source = await fetch_page(session, job_link)
+    soup = BeautifulSoup(page_source, "html.parser")
+    vacancy_description = soup.get_text()
+    if vacancy_description:
+        technologies = extract_technologies(vacancy_description)
+        logging.info(f"Technologies for {job_link}: {technologies}")
+        return technologies
+    else:
+        logging.warning(f"No description found for {job_link}")
+        return []
