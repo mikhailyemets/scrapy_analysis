@@ -151,3 +151,7 @@ async def main():
                     await writer.writerow({"technologies": technologies})
 
         logging.info(f"Technologies for all vacancies written to vacancies_technologies.csv")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
