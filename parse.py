@@ -84,3 +84,20 @@ async def fetch_page(session: ClientSession, url: str) -> str:
     """
     async with session.get(url) as response:
         return await response.text()
+
+
+def extract_technologies(text: str) -> List[str]:
+    """
+    Extracts a list of technologies mentioned in a given text.
+
+    Args:
+        text (str): The text to search for technologies.
+
+    Returns:
+        list: A list of technologies found in the text.
+    """
+    keywords_found = []
+    for keyword in keywords:
+        if keyword.lower() in text.lower():
+            keywords_found.append(keyword)
+    return keywords_found
