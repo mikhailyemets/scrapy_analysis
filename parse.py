@@ -69,3 +69,18 @@ def load_all_vacancies(url: str) -> str:
     page_source = driver.page_source
     driver.quit()
     return page_source
+
+
+async def fetch_page(session: ClientSession, url: str) -> str:
+    """
+    Fetches a web page asynchronously.
+
+    Args:
+        session (ClientSession): The aiohttp client session.
+        url (str): The URL of the web page to fetch.
+
+    Returns:
+        str: The content of the web page.
+    """
+    async with session.get(url) as response:
+        return await response.text()
