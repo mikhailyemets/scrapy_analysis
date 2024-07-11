@@ -44,21 +44,31 @@ def load_all_vacancies(url: str) -> str:
     """
     options = webdriver.ChromeOptions()
     options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()), options=options
+    )
     wait = WebDriverWait(driver, 20)
     driver.get(url)
 
     while True:
         try:
-            load_more_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "div.more-btn > a")))
-            driver.execute_script("arguments[0].scrollIntoView(true);", load_more_button)
+            load_more_button = wait.until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "div.more-btn > a"))
+            )
+            driver.execute_script(
+                "arguments[0].scrollIntoView(true);", load_more_button
+            )
             if load_more_button.is_displayed() and load_more_button.is_enabled():
                 logging.info("Clicking 'Load More' button")
                 load_more_button.click()
                 time.sleep(2)
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(1)
-                wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "li.l-vacancy")))
+                wait.until(
+                    EC.presence_of_all_elements_located(
+                        (By.CSS_SELECTOR, "li.l-vacancy")
+                    )
+                )
             else:
                 logging.info("'Load More' button is not active or visible")
                 break
@@ -139,7 +149,9 @@ async def main():
 
     ssl_context = ssl.create_default_context(cafile=certifi.where())
     async with ClientSession(connector=TCPConnector(ssl=ssl_context)) as session:
-        async with aio_open("vacancies_technologies.csv", "w", newline="", encoding="utf-8") as csvfile:
+        async with aio_open(
+            "vacancies_technologies.csv", "w", newline="", encoding="utf-8"
+        ) as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=["technologies"])
             await writer.writeheader()
 
@@ -150,7 +162,9 @@ async def main():
                 if technologies:
                     await writer.writerow({"technologies": technologies})
 
-        logging.info(f"Technologies for all vacancies written to vacancies_technologies.csv")
+        logging.info(
+            f"Technologies for all vacancies written to vacancies_technologies.csv"
+        )
 
 
 if __name__ == "__main__":
