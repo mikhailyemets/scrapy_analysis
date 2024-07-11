@@ -1,0 +1,6 @@
+aiohttp
+aiofiles
+beautifulsoup4
+selenium
+webdriver-manager
+certifi
